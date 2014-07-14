@@ -1,3 +1,0 @@
-Preguiça.
-
-Classe, Buffer. Membro, data. Método, preencher. É um retângulo? Não, uma série de retas, Aproximadas, retângulos. Método, linha. S, e, o que é? Começo e fim. Vetores, arrays, pontos, entenda como quiser. Por que começar com y? Por que não com x? Convenção. Buffer, sempre discreto. Discreto, sempre de um em um. Duas dimensões? Não. Duas vezes uma. Matriz... por que matriz? Mantenha um vetor.
