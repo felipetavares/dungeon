@@ -83,8 +83,8 @@ function begin () {
 
 	player = new DynamicObject();
 	player.p = [600,600];
-	player.circles[0].c = [32,32];
-	player.circles[0].r = 32;
+	player.circles[0].c = [16,16];
+	player.circles[0].r = 16;
 	physics.d_objects.push(player);
 
 	//buf.fillRect (0,0,10,10);

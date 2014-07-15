@@ -63,11 +63,10 @@ function Buffer (w,h) {
 
 			n++;
 
-			var size = scale;
+			var size;
 
 			switch (this.data[k]) {
 				case 0: case 5:
-					size = 0;
 				break;
 				case 1: case 3:
 					//html5.context.strokeRect (x,y, scale, scale);
@@ -81,10 +80,9 @@ function Buffer (w,h) {
 				break;
 			}
 	
-			if (player.p[1]+32 < y+size  && (size != 0 && !this.intersect(player.p, [x,y], scale))) {
-				html5.context.fillStyle = "blue";
-				html5.context.fillRect (player.p[0], player.p[1], scale, scale);
-				drawPlayer = false;	
+			if (player.p[1] < y+size) {
+				html5.context.drawImage (html5.image("0"), player.p[0], player.p[1]);
+				drawPlayer = false;
 			}
 			
 			html5.context.save();
@@ -93,33 +91,14 @@ function Buffer (w,h) {
 						 scale/this.images[this.data[k]].height);
 			html5.context.drawImage (this.images[this.data[k]], 0, 0);
 			html5.context.restore();
-			//console.log (y);
 		}
+
+		html5.context.fillColor = "white";
+		html5.context.font = "16px Pixel normal"
+		html5.context.fillText (""+(y+size), 0, 0);
 
 		//console.log (n);
 		//console.log (physics.s_objects.length);
-	}
-
-	this.intersectPoint = function (p, i, s) {
-		if (p[0] >= i[0] &&
-		    p[0] <= i[0]+s[0] &&
-		    p[1] >= i[1] &&
-		    p[1] <= i[1]+s[1])
-			return true;
-		return false;	
-	}
-
-	this.intersect = function (p0, p1, scale) {
-		if (this.intersectPoint(p0, p1, scale) ||
-		    this.intersectPoint([p0[0]+scale,p0[1]], p1, scale) ||
-		    this.intersectPoint([p0[0]+scale,p0[1]+scale], p1, scale) ||
-		    this.intersectPoint([p0[0],p0[1]+scale], p1, scale) ||
-		    this.intersectPoint(p1, p0, scale) ||
-		    this.intersectPoint([p1[0]+scale,p1[1]], p0, scale) ||
-		    this.intersectPoint([p1[0]+scale,p1[1]+scale], p0, scale) ||
-		    this.intersectPoint([p1[0],p1[1]+scale], p0, scale))
-			return true;
-		return false;
 	}
 
 	this.invert = function () {
