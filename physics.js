@@ -212,15 +212,15 @@ function Physics () {
     }   
 }
 
-function Circle (r) {
-	this.c = [0,0]
+function Circle (p, r) {
+	this.c = p;
 	this.p = [0,0]
 	this.r = r;
 }
 
 function DynamicObject () {
     this.circles = [
-    	new Circle(8)
+    	new Circle([0,0], 8)
     ];
     this.r = 16;
 

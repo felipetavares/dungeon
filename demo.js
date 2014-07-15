@@ -24,10 +24,10 @@ function drawCorridor (corridor) {
 
 var camera = [0,0];
 var dir = [
-	[0,-5],
-	[0,5],
-	[-5,0],
-	[5,0]
+	[0,-1],
+	[0,1],
+	[-1,0],
+	[1,0]
 ];
 
 function update () {
@@ -43,10 +43,12 @@ function update () {
 
 	html5.context.save()
 		html5.context.translate (-camera[0], -camera[1]);
-		buf.draw(80, player, camera[0], camera[1], html5.canvas.width, html5.canvas.height);
+		buf.draw(64, player, camera[0], camera[1], html5.canvas.width, html5.canvas.height);
 	html5.context.restore();
 
 	player.v = [0,0]
+
+	player.animation.pause();
 
 	if (html5.keyboard[html5.keyUp])
 		player.v = vm.copy(dir[0]);
@@ -57,16 +59,23 @@ function update () {
 	if (html5.keyboard[html5.keyRight])
 		player.v = vm.copy(dir[3]);
 
+	if (vm.len (player.v)) {
+		player.animation.play();
+	}
+
 	// Call update again
 	setTimeout (update, 17);
 }
 
 function begin () {
-
 	html5.getCanvas2dContext();
 	html5.loadImage ("images/0.png", "0");
 	html5.loadImage ("images/1.png", "1");
 	html5.loadImage ("images/2.png", "2");
+	html5.loadImage ("images/3.png", "3");
+
+	for (var i=0;i<8;i++)
+		html5.loadImage ("images/wizard/"+i+".png", "w"+i);
 
 	html5.context.webkitImageSmoothingEnabled = false;
 
@@ -83,9 +92,13 @@ function begin () {
 
 	player = new DynamicObject();
 	player.p = [600,600];
-	player.circles[0].c = [32,32];
-	player.circles[0].r = 32;
+	player.circles[0].c = [32,60];
+	player.circles[0].r = 4;
+	player.circles.push(new Circle([16,60],4));
+	player.circles.push(new Circle([48,60],4));
 	physics.d_objects.push(player);
+
+	player.animation = new Animation (0.1, ["w0","w1","w2","w3","w4","w5","w6","w7"]);
 
 	//buf.fillRect (0,0,10,10);
 

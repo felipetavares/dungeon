@@ -6,7 +6,7 @@ function Buffer (w,h) {
 	this.images = [
 		html5.image("0"),
 		html5.image("1"),
-		html5.image("1"),
+		html5.image("3"),
 		html5.image("2"),
 		html5.image("2"),
 		html5.image("1"),
@@ -32,6 +32,7 @@ function Buffer (w,h) {
 
 		var k = Math.floor(py)*this.w+Math.floor(px);
 		var e = Math.floor((py+sy))*this.w+Math.floor((px+sx))+1;
+
 		if (e > this.len)
 			e = this.len;
 		if (k < 0)
@@ -48,15 +49,56 @@ function Buffer (w,h) {
 		for (;k<e;k++) {
 			var x = Math.floor(k%this.w);
 			var y = Math.floor(k/this.w);
-			
-			if (x > px+sx) {
-				k += this.w-sx-2;
+
+			if (x < px-1 || x > px+sx ||
+				y < py-1 || y > py+sy)
 				continue;
-			}
-			if (x < px-1) {
-				k = px+y*this.w;
-				continue;				
-			}
+
+			x *= scale;
+			y *= scale;
+
+			n++;
+
+			var size = scale;
+
+			switch (this.data[k]) {
+				case 0: case 5:
+					html5.context.save();
+					html5.context.translate (x,y);
+					html5.context.scale (scale/this.images[this.data[k]].width,
+								 scale/this.images[this.data[k]].height);
+					html5.context.drawImage (this.images[this.data[k]], 0, 0);
+					html5.context.restore();
+					size = 0;
+				break;
+				case 1: case 3:
+					//html5.context.strokeRect (x,y, scale, scale);
+					physics.s_objects.push (new StaticObject ([x,y], [scale, scale]));
+					size = scale;
+				break;
+				case 2: case 4:
+					//html5.context.strokeRect (x, y+scale/8*7, scale, scale/8);
+					physics.s_objects.push (new StaticObject ([x,y+scale/4*3], [scale, scale/4]));
+					size = scale;	
+				break;
+			}			
+			//console.log (y);
+		}
+
+		var k = Math.floor(py)*this.w+Math.floor(px);
+		var e = Math.floor((py+sy))*this.w+Math.floor((px+sx))+1;
+		if (e > this.len)
+			e = this.len;
+		if (k < 0)
+			k = 0;
+
+		for (;k<e;k++) {
+			var x = Math.floor(k%this.w);
+			var y = Math.floor(k/this.w);
+
+			if (x < px-1 || x > px+sx ||
+				y < py-1 || y > py+sy)
+				continue;
 
 			x *= scale;
 			y *= scale;
@@ -71,40 +113,55 @@ function Buffer (w,h) {
 				break;
 				case 1: case 3:
 					//html5.context.strokeRect (x,y, scale, scale);
-					physics.s_objects.push (new StaticObject ([x,y], [scale, scale]));
 					size = scale;
 				break;
 				case 2: case 4:
 					//html5.context.strokeRect (x, y+scale/8*7, scale, scale/8);
-					physics.s_objects.push (new StaticObject ([x,y+scale/8*7], [scale, scale/8]));
 					size = scale;	
 				break;
+			}			
+
+			if (size != 0 && y+size > player.p[1]+scale && this.intersect(player.p, [x,y], scale) && drawPlayer) {
+				this.drawPlayer(player, scale);
+				drawPlayer = false;
 			}
-	
-			if (player.p[1]+32 < y+size  && (size != 0 && !this.intersect(player.p, [x,y], scale))) {
-				html5.context.fillStyle = "blue";
-				html5.context.fillRect (player.p[0], player.p[1], scale, scale);
-				drawPlayer = false;	
+
+			if (size != 0) {
+				html5.context.save();
+				html5.context.translate (x,y);
+				html5.context.scale (scale/this.images[this.data[k]].width,
+							 scale/this.images[this.data[k]].height);
+				html5.context.drawImage (this.images[this.data[k]], 0, 0);
+				html5.context.restore();
 			}
-			
-			html5.context.save();
-			html5.context.translate (x,y);
-			html5.context.scale (scale/this.images[this.data[k]].width,
-						 scale/this.images[this.data[k]].height);
-			html5.context.drawImage (this.images[this.data[k]], 0, 0);
-			html5.context.restore();
 			//console.log (y);
+		}
+
+		if (drawPlayer) {
+			this.drawPlayer(player, scale);
 		}
 
 		//console.log (n);
 		//console.log (physics.s_objects.length);
 	}
 
+	this.drawPlayer = function (player, scale) {
+		var img = html5.image("w0");
+
+		html5.context.save();
+		html5.context.translate (player.p[0],player.p[1]);
+		html5.context.scale (scale/img.width,
+					 		 scale/img.height);
+		html5.context.translate(img.width/2,img.height/2);
+		player.animation.draw([0,0]);
+		html5.context.restore();
+	}
+
 	this.intersectPoint = function (p, i, s) {
 		if (p[0] >= i[0] &&
-		    p[0] <= i[0]+s[0] &&
+		    p[0] <= i[0]+s &&
 		    p[1] >= i[1] &&
-		    p[1] <= i[1]+s[1])
+		    p[1] <= i[1]+s)
 			return true;
 		return false;	
 	}
